@@ -1,0 +1,183 @@
+public static void analyze() {
+        if (!open) {
+            if (trades.current.trade.price < trades.current.previous.previous.previous.previous.trade.price && trades.current.trade.bids > trades.current.previous.trade.bids) {
+                buy(trades.current.trade);
+                System.out.println("NEW CONTRACT PURCHASE - " + trades.current.trade.price);
+                open = true;
+            }
+        }
+        else {
+            if (trades.current.trade.price > trades.current.previous.trade.price) {
+                if (!p) {
+                    p = true;
+                }
+                else {
+                    sell(trades.current.trade);
+                    System.out.println("CONTRACT SOLD - " + trades.current.trade.price);
+                    System.out.println("PROFIT - $" + contracts[cSize - 1].getProfit());
+                    profit += contracts[cSize - 1].getProfit();
+                    System.out.println();
+                    open = false;
+                }
+            }
+        }
+    }
+
+$5387.5 on 12000 lines
+
+
+
+public static void analyze() {
+    if (!open) {
+        if (trades.current.trade.price < trades.current.previous.trade.price && trades.current.trade.bids > trades.current.previous.trade.bids) {
+            buy(trades.current.trade);
+            System.out.println("NEW CONTRACT PURCHASE - " + trades.current.trade.price);
+            open = true;
+        }
+    }
+    else {
+        if (trades.current.trade.price > trades.current.previous.trade.price) {
+            if (!p) {
+                p = true;
+            }
+            else {
+                sell(trades.current.trade);
+                System.out.println("CONTRACT SOLD - " + trades.current.trade.price);
+                System.out.println("PROFIT - $" + contracts[cSize - 1].getProfit());
+                profit += contracts[cSize - 1].getProfit();
+                System.out.println();
+                open = false;
+            }
+        }
+    }
+}
+
+$7362 on 12800 lines
+
+
+
+public static void analyze() {
+    if (!open) {
+        if (trades.current.trade.price < trades.current.previous.trade.price && 
+            trades.current.trade.bids > trades.current.previous.trade.bids && 
+            trades.current.trade.asks < trades.current.previous.trade.asks) {
+            buy(trades.current.trade);
+            System.out.println("NEW CONTRACT PURCHASE - " + trades.current.trade.price);
+            open = true;
+        }
+    }
+    else {
+        if (trades.current.trade.price > contracts[cSize - 1].oPrice) {
+            if (p < 0) {
+                p++;
+                testint++;
+            }
+            else {
+                sell(trades.current.trade);
+                System.out.println("CONTRACT SOLD - " + trades.current.trade.price);
+                System.out.println("PROFIT - $" + contracts[cSize - 1].getProfit());
+                profit += contracts[cSize - 1].getProfit();
+                System.out.println();
+                open = false;
+
+                if (contracts[cSize - 1].getProfit() == 0.0) {
+                    zero++;
+                }
+                else if (contracts[cSize - 1].getProfit() > 0) {
+                    successful++;
+                }
+                else if (contracts[cSize - 1].getProfit() < 0) {
+                    negative++;
+                }
+                p = 0;
+            }
+        }
+    }
+}
+
+96% accuracy
+
+
+public static void analyze() {
+    if (!open) {
+        if (trades.current.trade.price < trades.current.previous.trade.price && 
+            trades.current.trade.bids > trades.current.previous.trade.bids && 
+            trades.current.trade.asks < trades.current.previous.trade.asks) {
+            buy(trades.current.trade);
+        }
+    }
+    else {
+        if (trades.price() > contracts[cSize - 1].oPrice) {
+            sell(trades.current.trade);
+        }  
+    }
+}
+
+SAFE
+
+
+public static void analyze() {
+    checkState();
+    if (!open) {
+        if (s == State.BEAR) {
+            buy(trades.current.trade);
+        }
+    }
+    else {
+        if (s == State.BULL) {
+            sell(trades.current.trade);
+        }  
+    }
+}
+
+LEGENDARY $11,000 PROFIT
+
+
+public static void analyze() {
+    if (!open) {
+        if (trades.current.trade.price < trades.current.previous.trade.price && trades.current.trade.bids > trades.current.previous.trade.bids) {
+            buy(trades.current.trade);
+        }
+    }
+    else {
+        if (trades.current.trade.price > trades.current.previous.trade.price || currentProfit() < -0.25) {
+            sell(trades.current.trade);
+        }
+    }
+}
+
+$6800 profit 72.3 accuracy
+
+
+
+
+
+
+// checkState
+
+
+
+public static void checkState() {
+        if (trades.price() < trades.previous().price && 
+            trades.current.trade.bids < trades.previous().bids &&
+            trades.current.trade.askPrice < trades.previous().askPrice) {
+                s = State.BEAR;
+        }
+        else if (trades.price() > trades.previous().price && 
+            trades.current.trade.askPrice > trades.previous().askPrice && 
+            trades.delta3() > .25 &&
+            (s == State.BEAR_INCREASING || s == State.BULL)) {
+                s = State.BULL;
+        }
+        else if (trades.current.trade.bids < trades.previous().bids && 
+            trades.price() < trades.previous().price &&
+            s == State.BULL) {
+            s = State.BULL_DECREASING;
+        }
+        else if (trades.current.trade.bids > trades.previous().bids && 
+            trades.current.trade.trades > trades.previous().trades &&
+            trades.delta3() > 0 &&
+            (s == State.BEAR || s == State.BEAR_INCREASING)) {
+            s = State.BEAR_INCREASING;
+        }
+    }
