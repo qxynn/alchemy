@@ -48,18 +48,18 @@ public class TradeList {
 
     /**
      * ensures the list does not overflow
-     * resets to 5 items if it is at 100 for efficiency
+     * resets to 20 items if it is at 100 for efficiency
      */
     private void checkSize() {
         if (size == capacity) {
             TradeNode[] temp = list;
             list = new TradeNode[100];
-            for (int i = 0; i < 5; i++) {
-                list[i] = temp[capacity - 5 + i];
+            for (int i = 0; i < 20; i++) {
+                list[i] = temp[capacity - 20 + i];
                 list[0].previous = null;
             }
         }
-        size = 5;
+        size = 20;
     }
     /**
      * gets the price change between the past 5 trades
@@ -96,4 +96,16 @@ public class TradeList {
     public double delta(double b) {
         return current.trade.price - b;
     }
+
+    public double previous20() {
+        if (size < 20) {
+            return 0.0;
+        }
+        TradeNode current = list[size - 1];
+        for (int i = 0; i < 20; i++) {
+            current = current.previous;
+        }
+        return current.trade.price;
+    }
+
 }

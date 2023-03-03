@@ -4,7 +4,12 @@ import java.util.Scanner;
 
 public class Alchemy {
 
-    public static int days = 7;
+    public static int dayStart = 1;
+    public static int days = 10;
+
+    public static double localMaxProfit = 0;
+
+    public static int day;
 
     public static int currentLines;
 
@@ -45,6 +50,10 @@ public class Alchemy {
 
     public static int lines;
 
+    public static String st = "";
+
+    public static String rainbow = "";
+
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -58,7 +67,7 @@ public class Alchemy {
     public static State s;
 
     public static void main(String[] args) throws Exception {
-        for (int n = 1; n <= days; n++) {
+        for (int n = dayStart; n <= dayStart + days; n++) {
             initialize(n);
             File test = new File(testFile);
             Scanner scnr = new Scanner(test);
@@ -68,6 +77,14 @@ public class Alchemy {
                 String s = scnr.nextLine();
                 Trade t = processString(s);
                 trades.add(t);
+            }
+            for (int i = 0; i < 50; i++) {
+                String s = scnr.nextLine();
+                Trade t = processString(s);
+                trades.add(t);
+                if (t.price != trades.previous().price) {
+                    uniqueTrades.add(t);
+                }
             }
             //for (int i = 0; i < iterations; i++) {
             while (scnr.hasNextLine()) {
@@ -88,26 +105,49 @@ public class Alchemy {
             scnr.close();
             globalProfit += profit;
             globalProfitFees += profitFees;
-            //print();
+            print();
         }
+        System.out.println();
         System.out.print("\n\n\n");
         System.out.print("GLOBAL PROFIT OVER " + days + " DAYS: " + globalProfit + " | " + globalProfitFees + "\n\n\n");
     }
 
     public static void analyze() {
         checkState();
+        double p20 = trades.previous20();
+        double average = (p20 + trades.current.trade.price) / 2;
         if (!open) {
-            if (trades.current.trade.asks > trades.previous().asks &&
-                trades.current.trade.bidPrice > trades.previous().bidPrice &&
-                trades.delta3() == 0
+            if (
+        
+            trades.current.trade.bids > trades.current.trade.asks * 2 &&
+            uniqueTrades.current.trade.price > uniqueTrades.previous().price &&
+            trades.current.trade.bidPrice > uniqueTrades.previous().price &&
+            trades.current.trade.askPrice > uniqueTrades.previous().price &&
+            trades.current.trade.trades == 1 &&
+            trades.current.trade.bidPrice == trades.current.trade.price &&
+            average - trades.current.trade.price > 0 &&
+            p20 - trades.current.trade.price > 0.5
+    
                 ) {
                 buy(trades.current.trade);
             }
-            p++;
         }
         else {
-            if (currentProfit() < 0 || currentProfit() > 0) {
+            p++;
+            if (currentProfit() > localMaxProfit) {
+                localMaxProfit = currentProfit();
+            }
+            if (
+                trades.current.trade.bids < trades.previous().bids &&
+                trades.current.trade.asks > trades.current.trade.bids &&
+                trades.current.trade.asks > trades.previous().asks &&
+                trades.current.trade.trades == 1 &&
+                p20 - trades.current.trade.price < -0.25 &&
+                p > 10 ||
+                currentProfit() < -1
+                ) {
                 sell(trades.current.trade);
+                p = 0;
             }
         }
     }
@@ -245,20 +285,76 @@ public class Alchemy {
         else {
             check = ANSI_RED + "x" + ANSI_RESET;
         }
+        String s = "";
         int b = (int) Math.ceil((double) currentLines / 40);
         int n = (int) Math.ceil(((double) lines / b));
-        String s = "";
         for (int i = 0; i < n; i++) {
             s += "#";
         }
         for (int j = 0; j < 40 - n; j++) {
             s += "-";
         }
-        System.out.print("[ " + ANSI_GREEN + s + ANSI_RESET + " ] " + profit + " | " + profitFees + " | " + cSize + " | " +
-            lines + "   " + check + "\r");
+        String f = "";
+        s = "[ " + ANSI_GREEN + s + ANSI_RESET + " ] ";
+        f =  profit + " | " + profitFees + " | " + cSize + " | " + lines + "   " + check;
+        st = s + f + "\n";
+        //s = s + f;
+        //System.out.print(s + "\r");
+        
+        String tp = "";
+        if (profit < 0) {
+            tp = ANSI_RED;
+        }
+        else if (profit > 0 && profit <= 500) {
+            tp = ANSI_CYAN;
+        }
+        else if (profit > 500 && profit <= 1000) {
+            tp = ANSI_YELLOW;
+        }
+        else if (profit > 1000 && profit <= 5000) {
+            tp = ANSI_GREEN;
+        }
+        else if (profit > 5000) {
+            tp = ANSI_PURPLE;
+        }
+        String tp1 = "";
+        if (profitFees < 0) {
+            tp1 = ANSI_RED;
+        }
+        else if (profitFees > 0 && profit <= 500) {
+            tp1 = ANSI_CYAN;
+        }
+        else if (profitFees > 500 && profit <= 1000) {
+            tp1 = ANSI_YELLOW;
+        }
+        else if (profitFees > 1000 && profit <= 5000) {
+            tp1 = ANSI_GREEN;
+        }
+        else if (profitFees > 5000) {
+            tp1 = ANSI_PURPLE;
+        }
+        String r = ANSI_RESET;
+        
+        
+        rainbow = rainbow + profitFees + " ";
+        //System.out.print(rainbow + "\n\n\n");
+        //System.out.println("\n");
+        System.out.print(s);
+        System.out.format(
+            "[ " + tp + "%7.2f" + r + " ][ " + tp1 + "%7.2f" + r + " ][ " + "%7d" + " ][ " + "%7d" + " ][ " + check + " ][ " + day + " / " + days + " ]" + "\r", profit, profitFees, cSize, lines);
+        /*
+        if (rainbow.length() > 150) {
+            rainbow = rainbow.substring(rainbow.length() - 5);
+        }
+        */
+        //String.format(tp + "%.350s" + ANSI_RESET + "\r", rainbow);
+        //System.out.print(tp + rainbow + ANSI_RESET + "\r");
+        //System.out.format(st + "%08.2d" + " | " + "%08.2d" + " | " + "%08.2d" + " | " + "%08.2d" + " | " + "%08.2d" + check + "\r", profit, profitFees, cSize, lines);
     }
 
     public static void initialize(int i) {
+
+        day = i;
 
         trades = new TradeList();
 
@@ -268,7 +364,7 @@ public class Alchemy {
 
         cSize = 0;
 
-        testFile = "test-files/esdata" + i + ".csv";
+        testFile = "Alchemy/test-files/esdata" + i + ".csv";
 
         open = false;
 

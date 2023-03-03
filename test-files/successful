@@ -181,3 +181,85 @@ public static void checkState() {
             s = State.BEAR_INCREASING;
         }
     }
+
+
+    if ((currentProfit() > 0.75 || currentProfit() < 1) || p > 75 && currentProfit() > 0.25)
+    (currentProfit() > 0.75 || currentProfit() < -1)
+
+
+
+
+// WHAT I CAME BACK TO
+
+public static void analyze() {
+    checkState();
+    if (!open) {
+        if (
+
+        trades.current.trade.bids > trades.current.trade.asks * 2 &&
+        uniqueTrades.current.trade.price > uniqueTrades.previous().price &&
+        trades.current.trade.bidPrice > uniqueTrades.previous().price &&
+        trades.current.trade.askPrice > uniqueTrades.previous().price &&
+        trades.current.trade.trades == 1 &&
+        trades.current.trade.bidPrice == trades.current.trade.price
+
+            ) {
+            buy(trades.current.trade);
+        }
+    }
+    else {
+        if (
+            trades.current.trade.bids < trades.previous().bids &&
+            trades.current.trade.asks > trades.current.trade.bids &&
+            uniqueTrades.delta3() >= 0.25 &&
+            trades.current.trade.asks > trades.previous().asks &&
+            (currentProfit() > 0.75 || currentProfit() < -1) &&
+            trades.current.trade.trades == 1
+            ) {
+            sell(trades.current.trade);
+        }
+    }
+    p++;
+}
+
+
+
+public static void analyze() {
+    checkState();
+    double p20 = trades.previous20();
+    double average = (p20 + trades.current.trade.price) / 2;
+    if (!open) {
+        if (
+    
+        trades.current.trade.bids > trades.current.trade.asks * 2 &&
+        uniqueTrades.current.trade.price > uniqueTrades.previous().price &&
+        trades.current.trade.bidPrice > uniqueTrades.previous().price &&
+        trades.current.trade.askPrice > uniqueTrades.previous().price &&
+        trades.current.trade.trades == 1 &&
+        trades.current.trade.bidPrice == trades.current.trade.price &&
+        average - trades.current.trade.price > 0 &&
+        p20 - trades.current.trade.price > 0.5
+
+            ) {
+            buy(trades.current.trade);
+        }
+    }
+    else {
+        p++;
+        if (currentProfit() > localMaxProfit) {
+            localMaxProfit = currentProfit();
+        }
+        if (
+            trades.current.trade.bids < trades.previous().bids &&
+            trades.current.trade.asks > trades.current.trade.bids &&
+            trades.current.trade.asks > trades.previous().asks &&
+            trades.current.trade.trades == 1 &&
+            p20 - trades.current.trade.price < -0.25 &&
+            p > 10 ||
+            currentProfit() < -1
+            ) {
+            sell(trades.current.trade);
+            p = 0;
+        }
+    }
+}
