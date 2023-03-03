@@ -1,5 +1,5 @@
 const { Webhook, MessageBuilder } = require('discord-webhook-node');
-const hook = new Webhook("https://discord.com/api/webhooks/907712356082147339/hrmys8_5iTkzr2pdjgevrH4CqJPxrmSXM4KaTy0a0VkKEhl-F-2ShhNhm6S2MDY3g7ZU");
+const hook = new Webhook(" ******* ");
 
 
 /*
